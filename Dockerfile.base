@@ -1,5 +1,6 @@
+ARG IMAGE=ogre0403/gemini
 ARG VERSION=0.1.10
-FROM us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:${VERSION}
+FROM ${IMAGE}:${VERSION}-upstream
 
 USER root
 
