@@ -1,4 +1,6 @@
-FROM ogre0403/gemini:0.1.10-base
+ARG IMAGE=ogre0403/gemini
+ARG VERSION=0.1.10
+FROM ${IMAGE}:${VERSION}-base
 
 USER root
 
