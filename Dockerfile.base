@@ -1,0 +1,14 @@
+FROM us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.1.10
+
+USER root
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    vim \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/bin" sh
+
+USER node
+CMD ["gemini"]
+
