@@ -17,6 +17,7 @@ push-release: setup-buildx
 		--push \
 		-t $(IMAGE):$(VERSION) \
 		-f Dockerfile .
+	docker buildx rm multiarch || true
 
 # Individual stage builds (for testing purposes)
 upstream:
