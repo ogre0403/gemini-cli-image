@@ -17,6 +17,7 @@ RUN apk add --no-cache \
     vim   \
     bash  \
     jq    \
+    git   \
     curl
 
 RUN apk add --no-cache \
