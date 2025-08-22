@@ -33,6 +33,9 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/
 # Stage 3: Release image (equivalent to release image)
 FROM base AS release
 
+RUN apk add --no-cache \
+    tshark \
+    tcpdump
 
 RUN pipx install python-openstackclient && \
     pipx ensurepath
