@@ -5,7 +5,7 @@ ARG ENABLE_OPENSTACK=false
 ARG ENABLE_ALL=false
 
 # Stage 1: Build upstream (equivalent to upstream image)
-FROM node:20-alpine AS upstream
+FROM node:20-slim AS upstream
 ARG VERSION
 
 RUN npm install -g @google/gemini-cli@${VERSION} && \
@@ -16,19 +16,29 @@ CMD ["gemini"]
 # Stage 2: Base image (equivalent to base image)
 FROM upstream AS base
 
-RUN apk add --no-cache \
-    vim   \
-    bash  \
-    jq    \
-    git   \
-    curl
-
-RUN apk add --no-cache \
-    python3-dev \
-    pipx        \
-    gcc         \
-    musl-dev    \
-    linux-headers
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  python3 \
+  pipx	\
+  make \
+  g++ \
+  man-db \
+  curl \
+  dnsutils \
+  less \
+  jq \
+  bc \
+  gh \
+  git \
+  unzip \
+  rsync \
+  ripgrep \
+  procps \
+  psmisc \
+  lsof \
+  socat \
+  ca-certificates \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/bin" sh
 
@@ -41,7 +51,7 @@ ARG ENABLE_ALL
 
 # Install tcpdump analysis tool (if enabled)
 RUN if [ "$ENABLE_ALL" = "true" ] || [ "$ENABLE_TCPDUMP" = "true" ]; then \
-        apk add --no-cache tshark tcpdump; \
+        apt install -y --no-install-recommends  tshark tcpdump; \
     fi
 
 # Install openstack client tool (if enabled)
