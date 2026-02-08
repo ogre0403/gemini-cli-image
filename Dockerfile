@@ -1,17 +1,31 @@
 # Multi-stage Dockerfile for gemini-cli
 ARG VERSION=0.1.9
+ARG AGENT=gemini
 ARG ENABLE_TCPDUMP=false
 ARG ENABLE_OPENSTACK=false
 ARG ENABLE_ALL=false
 
 # Stage 1: Build upstream (equivalent to upstream image)
-FROM node:20-slim AS upstream
+FROM node:24-slim AS upstream
 ARG VERSION
+ARG AGENT
 
-RUN npm install -g @google/gemini-cli@${VERSION} && \
-    npm cache clean --force
+RUN sh -c ' \
+    case "$AGENT" in \
+        codex) PACKAGE_NAME="openai/codex"; CMD="codex" ;; \
+        gemini) PACKAGE_NAME="google/gemini-cli"; CMD="gemini" ;; \
+        *) echo "Unknown AGENT: $AGENT" && exit 1 ;; \
+    esac && \
+    npm install -g @${PACKAGE_NAME}@${VERSION} && \
+    npm cache clean --force \
+    '
 
-CMD ["gemini"]
+ENV AGENT=${AGENT}
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD []
 
 # Stage 2: Base image (equivalent to base image)
 FROM upstream AS base

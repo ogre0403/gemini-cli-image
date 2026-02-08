@@ -1,5 +1,6 @@
-IMAGE = ogre0403/gemini
-VERSION = 0.1.9
+AGENT=codex
+IMAGE = ogre0403/${AGENT}
+VERSION = latest
 TEMP_DIR := $(shell mktemp -d)
 PLATFORMS = linux/amd64,linux/arm64
 
@@ -10,6 +11,7 @@ ENABLE_ALL ?= false
 
 # Build args for docker
 BUILD_ARGS = --build-arg VERSION=$(VERSION) \
+			 --build-arg AGENT=$(AGENT) \
 			 --build-arg ENABLE_TCPDUMP=$(ENABLE_TCPDUMP) \
 			 --build-arg ENABLE_OPENSTACK=$(ENABLE_OPENSTACK) \
 			 --build-arg ENABLE_ALL=$(ENABLE_ALL)
@@ -44,14 +46,14 @@ push-release: setup-buildx
 upstream:
 	docker build \
 		--target upstream \
-		--build-arg VERSION=$(VERSION) \
+		$(BUILD_ARGS) \
 		-t $(IMAGE):$(VERSION)-upstream \
 		-f Dockerfile .
 
 base: upstream
 	docker build \
 		--target base \
-		--build-arg VERSION=$(VERSION) \
+		$(BUILD_ARGS) \
 		-t $(IMAGE):$(VERSION)-base \
 		-f Dockerfile .
 
