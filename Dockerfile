@@ -14,9 +14,10 @@ RUN sh -c ' \
     case "$AGENT" in \
         codex) PACKAGE_NAME="openai/codex"; CMD="codex" ;; \
         gemini) PACKAGE_NAME="google/gemini-cli"; CMD="gemini" ;; \
+        opencode) PACKAGE_NAME="opencode-ai"; CMD="opencode" ;; \
         *) echo "Unknown AGENT: $AGENT" && exit 1 ;; \
     esac && \
-    npm install -g @${PACKAGE_NAME}@${VERSION} && \
+    npm install -g ${PACKAGE_NAME}@${VERSION} && \
     npm cache clean --force \
     '
 

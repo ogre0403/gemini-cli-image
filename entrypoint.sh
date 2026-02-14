@@ -6,6 +6,7 @@ if [ -n "$AGENT" ]; then
   case "$AGENT" in
     codex) CMD="codex" ;;
     gemini) CMD="gemini" ;;
+	opencode) CMD="opencode" ;;
     *) echo "Unknown AGENT: $AGENT" >&2; exit 1 ;;
   esac
 else
@@ -13,6 +14,8 @@ else
     CMD="codex"
   elif command -v gemini >/dev/null 2>&1; then
     CMD="gemini"
+  elif command -v opencode >/dev/null 2>&1; then
+	CMD="opencode"	
   else
     echo "No agent command found (codex or gemini)" >&2
     exit 1
