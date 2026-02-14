@@ -4,8 +4,8 @@ set -e
 # Determine command to run based on AGENT env (set at build time) or detect installed binary
 if [ -n "$AGENT" ]; then
   case "$AGENT" in
-    codex) CMD="codex" ;;
-    gemini) CMD="gemini" ;;
+    codex)    CMD="codex"    ;;
+    gemini)   CMD="gemini"   ;;
 	opencode) CMD="opencode" ;;
     *) echo "Unknown AGENT: $AGENT" >&2; exit 1 ;;
   esac

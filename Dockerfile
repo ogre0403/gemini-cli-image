@@ -6,30 +6,7 @@ ARG ENABLE_OPENSTACK=false
 ARG ENABLE_ALL=false
 
 # Stage 1: Build upstream (equivalent to upstream image)
-FROM node:24-slim AS upstream
-ARG VERSION
-ARG AGENT
-
-RUN sh -c ' \
-    case "$AGENT" in \
-        codex) PACKAGE_NAME="openai/codex"; CMD="codex" ;; \
-        gemini) PACKAGE_NAME="google/gemini-cli"; CMD="gemini" ;; \
-        opencode) PACKAGE_NAME="opencode-ai"; CMD="opencode" ;; \
-        *) echo "Unknown AGENT: $AGENT" && exit 1 ;; \
-    esac && \
-    npm install -g ${PACKAGE_NAME}@${VERSION} && \
-    npm cache clean --force \
-    '
-
-ENV AGENT=${AGENT}
-ADD entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD []
-
-# Stage 2: Base image (equivalent to base image)
-FROM upstream AS base
+FROM node:24-slim AS base
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   python3 \
@@ -57,9 +34,33 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/bin" sh
 
+# Stage 2: Base image (equivalent to base image)
+FROM base AS upstream
+ARG VERSION
+ARG AGENT
+
+RUN sh -c ' \
+    case "$AGENT" in \
+        codex)    PACKAGE_NAME="@openai/codex"      ; CMD="codex"    ;; \
+        gemini)   PACKAGE_NAME="@google/gemini-cli" ; CMD="gemini"   ;; \
+        opencode) PACKAGE_NAME="opencode-ai"        ; CMD="opencode" ;; \
+        *) echo "Unknown AGENT: $AGENT" && exit 1 ;; \
+    esac && \
+    npm install -g ${PACKAGE_NAME}@${VERSION} && \
+    npm cache clean --force \
+    '
+
+ENV AGENT=${AGENT}
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD []
+
+
 
 # Stage 3: Release image (equivalent to release image)
-FROM base AS release
+FROM upstream AS release
 ARG ENABLE_TCPDUMP
 ARG ENABLE_OPENSTACK
 ARG ENABLE_ALL
