@@ -7,6 +7,8 @@ PLATFORMS = linux/amd64,linux/arm64
 # Build options
 ENABLE_TCPDUMP ?= false
 ENABLE_OPENSTACK ?= false
+ENABLE_GOLANG ?= false
+GOLANG_VERSION ?=
 ENABLE_ALL ?= false
 
 # Build args for docker
@@ -14,6 +16,8 @@ BUILD_ARGS = --build-arg VERSION=$(VERSION) \
 			 --build-arg AGENT=$(AGENT) \
 			 --build-arg ENABLE_TCPDUMP=$(ENABLE_TCPDUMP) \
 			 --build-arg ENABLE_OPENSTACK=$(ENABLE_OPENSTACK) \
+			 --build-arg ENABLE_GOLANG=$(ENABLE_GOLANG) \
+			 $(if $(GOLANG_VERSION),--build-arg GOLANG_VERSION=$(GOLANG_VERSION),) \
 			 --build-arg ENABLE_ALL=$(ENABLE_ALL)
 
 
@@ -23,9 +27,11 @@ BUILD_ARGS = --build-arg VERSION=$(VERSION) \
 .PHONY: help
 help:
 	@echo "可用的 build 參數："
-	@echo "  ENABLE_TCPDUMP=true    啟用 tcpdump/tshark 網路分析工具"
-	@echo "  ENABLE_OPENSTACK=true  啟用 OpenStack client 工具 (python-openstackclient)"
-	@echo "  ENABLE_ALL=true        啟用所有額外功能 (等同於同時設 true)"
+	@echo "  ENABLE_TCPDUMP=true          啟用 tcpdump/tshark 網路分析工具"
+	@echo "  ENABLE_OPENSTACK=true        啟用 OpenStack client 工具 (python-openstackclient)"
+	@echo "  ENABLE_GOLANG=true           啟用 Go (golang) binary (安裝最新穩定版)"
+	@echo "  GOLANG_VERSION=<version>     指定 GOTOOLCHAIN 版本 (例如 1.22.0)，需同時啟用 ENABLE_GOLANG"
+	@echo "  ENABLE_ALL=true              啟用所有額外功能 (等同於同時設 true)"
 	@echo "預設都為 false，不會安裝上述工具。"
 
 

@@ -3,6 +3,8 @@ ARG VERSION=0.1.9
 ARG AGENT=gemini
 ARG ENABLE_TCPDUMP=false
 ARG ENABLE_OPENSTACK=false
+ARG ENABLE_GOLANG=false
+ARG GOLANG_VERSION=
 ARG ENABLE_ALL=false
 
 # Stage 1: Build upstream (equivalent to upstream image)
@@ -64,6 +66,8 @@ CMD []
 FROM upstream AS release
 ARG ENABLE_TCPDUMP
 ARG ENABLE_OPENSTACK
+ARG ENABLE_GOLANG
+ARG GOLANG_VERSION
 ARG ENABLE_ALL
 
 # Install tcpdump analysis tool (if enabled)
@@ -77,3 +81,20 @@ RUN if [ "$ENABLE_ALL" = "true" ] || [ "$ENABLE_OPENSTACK" = "true" ]; then \
         pipx ensurepath; \
     fi
 
+# Install golang binary (latest stable release, if enabled)
+RUN if [ "$ENABLE_ALL" = "true" ] || [ "$ENABLE_GOLANG" = "true" ]; then \
+        LATEST_GO=$(curl -fsSL 'https://go.dev/dl/?mode=json' | jq -r '.[0].version') && \
+        ARCH=$(dpkg --print-architecture) && \
+        curl -fsSL "https://go.dev/dl/${LATEST_GO}.linux-${ARCH}.tar.gz" -o /tmp/go.tar.gz && \
+        tar -C /usr/local -xzf /tmp/go.tar.gz && \
+        rm /tmp/go.tar.gz && \
+        ln -sf /usr/local/go/bin/go /usr/local/bin/go && \
+        ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt; \
+    fi
+
+# Set GOTOOLCHAIN if a specific Go version is requested
+ENV GOTOOLCHAIN=${GOLANG_VERSION:+go${GOLANG_VERSION}}
+
+# Force get the specific version of Go download in specific GOPATH
+ENV GOPATH=/tmp/go
+RUN go version
