@@ -89,12 +89,9 @@ RUN if [ "$ENABLE_ALL" = "true" ] || [ "$ENABLE_GOLANG" = "true" ]; then \
         tar -C /usr/local -xzf /tmp/go.tar.gz && \
         rm /tmp/go.tar.gz && \
         ln -sf /usr/local/go/bin/go /usr/local/bin/go && \
-        ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt; \
+        ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt && \
+        echo "export GOPATH=/tmp/go" >> /etc/profile.d/golang.sh && \
+        { [ -n "$GOLANG_VERSION" ] && echo "export GOTOOLCHAIN=go${GOLANG_VERSION}" >> /etc/profile.d/golang.sh || true; } && \
+        export GOPATH=/tmp/go && \
+        go version; \
     fi
-
-# Set GOTOOLCHAIN if a specific Go version is requested
-ENV GOTOOLCHAIN=${GOLANG_VERSION:+go${GOLANG_VERSION}}
-
-# Force get the specific version of Go download in specific GOPATH
-ENV GOPATH=/tmp/go
-RUN go version
