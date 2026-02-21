@@ -10,6 +10,10 @@ ENABLE_OPENSTACK ?= false
 ENABLE_GOLANG ?= false
 GOLANG_VERSION ?=
 ENABLE_ALL ?= false
+NO_CACHE ?= false
+
+# No-cache flag
+CACHE_FLAG = $(if $(filter true,$(NO_CACHE)),--no-cache,)
 
 # Build args for docker
 BUILD_ARGS = --build-arg VERSION=$(VERSION) \
@@ -32,6 +36,7 @@ help:
 	@echo "  ENABLE_GOLANG=true           啟用 Go (golang) binary (安裝最新穩定版)"
 	@echo "  GOLANG_VERSION=<version>     指定 GOTOOLCHAIN 版本 (例如 1.22.0)，需同時啟用 ENABLE_GOLANG"
 	@echo "  ENABLE_ALL=true              啟用所有額外功能 (等同於同時設 true)"
+	@echo "  NO_CACHE=true                build image 時不使用 cache (--no-cache)"
 	@echo "預設都為 false，不會安裝上述工具。"
 
 
@@ -43,6 +48,7 @@ push-release: setup-buildx
 		--platform $(PLATFORMS) \
 		--target release \
 		$(BUILD_ARGS) \
+		$(CACHE_FLAG) \
 		--push \
 		-t $(IMAGE):$(VERSION) \
 		-f Dockerfile .
@@ -53,6 +59,7 @@ base:
 	docker build \
 		--target base \
 		$(BUILD_ARGS) \
+		$(CACHE_FLAG) \
 		-t $(IMAGE):$(VERSION)-base \
 		-f Dockerfile .
 
@@ -60,6 +67,7 @@ upstream: base
 	docker build \
 		--target upstream \
 		$(BUILD_ARGS) \
+		$(CACHE_FLAG) \
 		-t $(IMAGE):$(VERSION)-upstream \
 		-f Dockerfile .
 	docker rmi $(IMAGE):$(VERSION)-base
@@ -68,6 +76,7 @@ release: upstream
 	docker build \
 		--target release \
 		$(BUILD_ARGS) \
+		$(CACHE_FLAG) \
 		-t $(IMAGE):$(VERSION) \
 		-f Dockerfile .
 	docker rmi $(IMAGE):$(VERSION)-upstream
