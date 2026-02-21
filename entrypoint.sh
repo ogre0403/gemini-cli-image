@@ -1,6 +1,11 @@
 #!/bin/sh
 set -e
 
+# source golang environment if the script exists (only added when Go is installed)
+if [ -f /etc/profile.d/golang.sh ]; then
+    . /etc/profile.d/golang.sh
+fi
+
 # Determine command to run based on AGENT env (set at build time) or detect installed binary
 if [ -n "$AGENT" ]; then
   case "$AGENT" in

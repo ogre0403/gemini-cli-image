@@ -92,6 +92,6 @@ RUN if [ "$ENABLE_ALL" = "true" ] || [ "$ENABLE_GOLANG" = "true" ]; then \
         ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt && \
         echo "export GOPATH=/tmp/go" >> /etc/profile.d/golang.sh && \
         { [ -n "$GOLANG_VERSION" ] && echo "export GOTOOLCHAIN=go${GOLANG_VERSION}" >> /etc/profile.d/golang.sh || true; } && \
-        export GOPATH=/tmp/go && \
+        . /etc/profile.d/golang.sh && \
         go version; \
     fi
