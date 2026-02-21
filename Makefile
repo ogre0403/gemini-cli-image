@@ -49,28 +49,30 @@ push-release: setup-buildx
 	docker buildx rm multiarch || true
 
 # Individual stage builds (for testing purposes)
-upstream:
-	docker build \
-		--target upstream \
-		$(BUILD_ARGS) \
-		-t $(IMAGE):$(VERSION)-upstream \
-		-f Dockerfile .
-
-base: upstream
+base:
 	docker build \
 		--target base \
 		$(BUILD_ARGS) \
 		-t $(IMAGE):$(VERSION)-base \
 		-f Dockerfile .
 
-release: base
+upstream: base
+	docker build \
+		--target upstream \
+		$(BUILD_ARGS) \
+		-t $(IMAGE):$(VERSION)-upstream \
+		-f Dockerfile .
+	docker rmi $(IMAGE):$(VERSION)-base
+
+release: upstream
 	docker build \
 		--target release \
 		$(BUILD_ARGS) \
 		-t $(IMAGE):$(VERSION) \
 		-f Dockerfile .
+	docker rmi $(IMAGE):$(VERSION)-upstream
 
-release-all: base
+release-all:
 	$(MAKE) release ENABLE_ALL=true
 
 
