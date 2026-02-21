@@ -54,6 +54,7 @@ RUN sh -c ' \
     '
 
 ENV AGENT=${AGENT}
+ENV PATH="/root/.local/bin:$PATH"
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
