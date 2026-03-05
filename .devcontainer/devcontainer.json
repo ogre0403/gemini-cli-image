@@ -3,20 +3,22 @@
 {
 	"name": "alpine",
 	"image": "alpine:3.22.0",
-	"features": {},
+	"features": {
+		"ghcr.io/cirolosapio/devcontainers-features/alpine-git:0": {}
+	},
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"GitHub.copilot",
-				// "isudox.vscode-jetbrains-keybindings"
+				"arifum.bedrock-vscode-chat"
 			]
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "apk add git"
+	// "postCreateCommand": "apk add git"
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
